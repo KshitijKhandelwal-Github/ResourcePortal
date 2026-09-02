@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Reference File
+OCMT Team Management Project Requirements.pdf
