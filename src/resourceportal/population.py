@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
-from database import SessionLocal
-from models import (
+from .database import SessionLocal
+from .models import (
     User,
     Resource,
     Cluster,
@@ -10,8 +9,9 @@ from models import (
     ResourceSkill,
     Training,
     Certification,
-    Location
+    Location,
 )
+from .services.auth_service import get_password_hash
 
 
 router = APIRouter(
@@ -206,7 +206,7 @@ def populate_database():
                 User(
                     username="admin",
                     email="admin@company.com",
-                    password_hash="hashed_password_001",
+                    password_hash=get_password_hash("admin123"),
                     role="ADMIN",
                     resource_id=None,
                     is_active=1
@@ -214,7 +214,7 @@ def populate_database():
                 User(
                     username="rahul",
                     email="rahul.sharma@company.com",
-                    password_hash="hashed_password_002",
+                    password_hash=get_password_hash("rahul123"),
                     role="REGULAR_USER",
                     resource_id=1,
                     is_active=1
@@ -222,7 +222,7 @@ def populate_database():
                 User(
                     username="priya",
                     email="priya.kumar@company.com",
-                    password_hash="hashed_password_003",
+                    password_hash=get_password_hash("priya123"),
                     role="REGULAR_USER",
                     resource_id=2,
                     is_active=1
@@ -230,7 +230,7 @@ def populate_database():
                 User(
                     username="arun",
                     email="arun.raj@company.com",
-                    password_hash="hashed_password_004",
+                    password_hash=get_password_hash("arun123"),
                     role="REGULAR_USER",
                     resource_id=3,
                     is_active=1
@@ -238,7 +238,7 @@ def populate_database():
                 User(
                     username="sneha",
                     email="sneha.patel@company.com",
-                    password_hash="hashed_password_005",
+                    password_hash=get_password_hash("sneha123"),
                     role="REGULAR_USER",
                     resource_id=4,
                     is_active=1
@@ -246,7 +246,7 @@ def populate_database():
                 User(
                     username="vikram",
                     email="vikram.singh@company.com",
-                    password_hash="hashed_password_006",
+                    password_hash=get_password_hash("vikram123"),
                     role="SENIOR_ASSOCIATE",
                     resource_id=5,
                     is_active=1
@@ -254,7 +254,7 @@ def populate_database():
                 User(
                     username="ananya",
                     email="ananya.iyer@company.com",
-                    password_hash="hashed_password_007",
+                    password_hash=get_password_hash("ananya123"),
                     role="REGULAR_USER",
                     resource_id=6,
                     is_active=1
@@ -262,7 +262,7 @@ def populate_database():
                 User(
                     username="karthik",
                     email="karthik.rao@company.com",
-                    password_hash="hashed_password_008",
+                    password_hash=get_password_hash("karthik123"),
                     role="REGULAR_USER",
                     resource_id=7,
                     is_active=1
@@ -270,7 +270,7 @@ def populate_database():
                 User(
                     username="divya",
                     email="divya.menon@company.com",
-                    password_hash="hashed_password_009",
+                    password_hash=get_password_hash("divya123"),
                     role="REGULAR_USER",
                     resource_id=8,
                     is_active=1
@@ -278,7 +278,7 @@ def populate_database():
                 User(
                     username="sanjay",
                     email="sanjay.verma@company.com",
-                    password_hash="hashed_password_010",
+                    password_hash=get_password_hash("sanjay123"),
                     role="REGULAR_USER",
                     resource_id=9,
                     is_active=1
