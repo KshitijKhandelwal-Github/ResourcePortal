@@ -1,6 +1,6 @@
 # Database Seeder (`seed.py`)
 
-## Overview
+## Overview (Check)
 
 The [`seed.py`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/seed.py) file is responsible for populating an empty database with realistic initial data when the application starts for the first time.
 
