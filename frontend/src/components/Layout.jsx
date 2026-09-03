@@ -16,4 +16,5 @@ const Layout = () => {
     </div>
   );
 };
-export default Layout;\n
+
+export default Layout;

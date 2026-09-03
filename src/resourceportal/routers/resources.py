@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional
 from resourceportal.database.database import get_db
-from resourceportal.schemas.resource import ResourceOut, ResourceCreate, ResourceUpdate, ResourceListResponse, SkillBrief
+from resourceportal.schemas.resource import ResourceOut, ResourceCreate, ResourceUpdate, ResourceListResponse, SkillBrief, ClusterBrief, LocationBrief
 from resourceportal.services import resource_service
 from resourceportal.utils.dependencies import get_current_user, require_role
 from resourceportal.models.user import User
@@ -10,14 +10,42 @@ from resourceportal.utils.exceptions import NotFoundException
 
 router = APIRouter(prefix="/api/v1/resources", tags=["resources"])
 
-def _resource_to_out(r) -> dict:
-    """Convert a resource model to ResourceOut-compatible dict with nested skills."""
-    skills = []
-    if hasattr(r, '_secondary_skills') and r._secondary_skills:
-        skills = [SkillBrief.model_validate(s) for s in r._secondary_skills]
-    elif hasattr(r, 'skills') and r.skills:
-        skills = [SkillBrief.model_validate(rs.skill) for rs in r.skills if rs.skill]
-    return ResourceOut.model_validate(r, from_attributes=True).model_copy(update={"skills": skills})
+def _resource_to_out(r) -> ResourceOut:
+    """Convert a resource SQLAlchemy model to ResourceOut schema, resolving nested relationships."""
+    # Build skills list from ResourceSkill association objects
+    skill_briefs = []
+    if hasattr(r, 'skills') and r.skills:
+        for rs in r.skills:
+            if rs.skill:
+                skill_briefs.append(SkillBrief(id=rs.skill.id, name=rs.skill.name, category=rs.skill.category))
+
+    # Build cluster, location, primary_skill briefs
+    cluster = ClusterBrief(id=r.cluster.id, name=r.cluster.name) if r.cluster else None
+    primary_skill = SkillBrief(id=r.primary_skill.id, name=r.primary_skill.name, category=r.primary_skill.category) if r.primary_skill else None
+    current_location = LocationBrief(id=r.current_location.id, city=r.current_location.city) if r.current_location else None
+    preferred_location = LocationBrief(id=r.preferred_location.id, city=r.preferred_location.city) if r.preferred_location else None
+
+    return ResourceOut(
+        id=r.id,
+        employee_id=r.employee_id,
+        name=r.name,
+        email=r.email,
+        cluster_id=r.cluster_id,
+        designation=r.designation,
+        years_of_experience=r.years_of_experience,
+        current_location_id=r.current_location_id,
+        preferred_location_id=r.preferred_location_id,
+        availability_status=r.availability_status,
+        primary_skill_id=r.primary_skill_id,
+        user_id=r.user_id,
+        created_at=r.created_at,
+        updated_at=r.updated_at,
+        cluster=cluster,
+        primary_skill=primary_skill,
+        current_location=current_location,
+        preferred_location=preferred_location,
+        skills=skill_briefs,
+    )
 
 @router.get("", response_model=ResourceListResponse)
 def get_resources(
