@@ -332,9 +332,9 @@ class User(Base):
     )
 
     created_at = Column(
-        String,
+        DateTime,
         nullable=False,
-        default="CURRENT_TIMESTAMP"
+        default=lambda: datetime.now().replace(microsecond=0)
     )
 
     __table_args__ = (
