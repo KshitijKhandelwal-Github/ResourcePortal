@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from resourceportal.database.database import get_db
+from resourceportal.database import get_db
 from resourceportal.schemas.training import TrainingOut, TrainingCreate, TrainingUpdate
-from resourceportal.models.training import Training
-from resourceportal.models.resource import Resource
+from resourceportal.models import Resource, Training
 from resourceportal.utils.dependencies import get_current_user
-from resourceportal.models.user import User
+from resourceportal.models import User
 from resourceportal.utils.exceptions import NotFoundException
 
 router = APIRouter(prefix="/api/v1", tags=["training"])

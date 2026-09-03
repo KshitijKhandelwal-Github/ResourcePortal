@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from typing import List
-from resourceportal.database.database import get_db
+from resourceportal.database import get_db
 from resourceportal.schemas.location import LocationOut, LocationCreate, LocationUpdate
-from resourceportal.models.location import Location
+from resourceportal.models import Location
 from resourceportal.utils.dependencies import require_role
 from resourceportal.utils.exceptions import NotFoundException
 

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from resourceportal.database.database import get_db
+from resourceportal.database import get_db
 from resourceportal.schemas.user import UserOut, UserUpdate
-from resourceportal.models.user import User
+from resourceportal.models import User
 from resourceportal.utils.dependencies import require_role, get_current_user
 from resourceportal.utils.exceptions import NotFoundException
 

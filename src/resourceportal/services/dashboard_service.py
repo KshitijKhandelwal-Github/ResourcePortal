@@ -1,10 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case, and_
 from typing import Optional
-from resourceportal.models.resource import Resource, ResourceSkill
-from resourceportal.models.skill import Skill
-from resourceportal.models.location import Location
-from resourceportal.models.training import Training
+from resourceportal.models import Location, Resource, ResourceSkill, Skill, Training
 
 def _apply_filters(query, cluster_id=None, skill_id=None, location_id=None, availability_status=None):
     if cluster_id:

@@ -1,22 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from resourceportal.database.database import get_db
+from resourceportal.database import get_db
 from resourceportal.services.auth_service import verify_password, create_access_token, get_password_hash
-from resourceportal.models.user import User
-from resourceportal.schemas.user import LoginRequest, LoginResponse, UserCreate, UserOut
+from resourceportal.models import User
+from resourceportal.schemas.user import LoginRequest, LoginResponse, Token, UserCreate, UserOut
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
-@router.post("/login", response_model=LoginResponse)
-async def login(request: Request, db: Session = Depends(get_db)):
-    if "application/json" in request.headers.get("content-type", ""):
-        login_data = LoginRequest.model_validate(await request.json())
-    else:
-        form_data = await request.form()
-        login_data = LoginRequest.model_validate(dict(form_data))
-
-    user = db.query(User).filter(User.username == login_data.username).first()
-    if not user or not verify_password(login_data.password, user.hashed_password):
+def _authenticate(username: str, password: str, db: Session) -> User:
+    user = db.query(User).filter(User.username == username).first()
+    if not user or not verify_password(password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -24,6 +18,11 @@ async def login(request: Request, db: Session = Depends(get_db)):
         )
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User account is deactivated")
+    return user
+
+@router.post("/login", response_model=LoginResponse)
+def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+    user = _authenticate(login_data.username, login_data.password, db)
     access_token = create_access_token(data={"sub": user.username})
     return LoginResponse(
         access_token=access_token,
@@ -32,10 +31,15 @@ async def login(request: Request, db: Session = Depends(get_db)):
             username=user.username,
             email=user.email,
             role=user.role,
-            cluster_id=user.cluster_id,
+            cluster_id=None,
             is_active=user.is_active,
         ),
     )
+
+@router.post("/token", response_model=Token, include_in_schema=False)
+def token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = _authenticate(form_data.username, form_data.password, db)
+    return {"access_token": create_access_token(data={"sub": user.username}), "token_type": "bearer"}
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -48,8 +52,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         username=user.username,
         email=user.email,
         role=user.role,
-        cluster_id=user.cluster_id,
-        hashed_password=hashed_password,
+        password_hash=hashed_password,
     )
     db.add(new_user)
     db.commit()

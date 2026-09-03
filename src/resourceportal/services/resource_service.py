@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import or_
-from resourceportal.models.resource import Resource, ResourceSkill
-from resourceportal.models.skill import Skill
+from resourceportal.models import Resource, ResourceSkill, Skill
 from resourceportal.schemas.resource import ResourceCreate, ResourceUpdate
 from resourceportal.utils.exceptions import NotFoundException
 import logging

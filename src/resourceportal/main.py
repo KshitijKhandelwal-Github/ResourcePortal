@@ -1,15 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from resourceportal.database.database import engine, Base, get_db
-from resourceportal.database.seed import seed_db
+from resourceportal.database import engine, Base, get_db
+from resourceportal.population import populate_database
 from resourceportal.routers import auth, resources, dashboard, users, skills, clusters, locations, certifications, training
 import contextlib
 
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
-    db = next(get_db())
-    seed_db(db)
+    populate_database()
     yield
 
 app = FastAPI(title="Resource Management Portal", lifespan=lifespan)

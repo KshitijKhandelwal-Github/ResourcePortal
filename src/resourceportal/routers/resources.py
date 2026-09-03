@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional
-from resourceportal.database.database import get_db
+from resourceportal.database import get_db
 from resourceportal.schemas.resource import ResourceOut, ResourceCreate, ResourceUpdate, ResourceListResponse, SkillBrief, ClusterBrief, LocationBrief
 from resourceportal.services import resource_service
 from resourceportal.utils.dependencies import get_current_user, require_role
-from resourceportal.models.user import User
+from resourceportal.models import User
 from resourceportal.utils.exceptions import NotFoundException
 
 router = APIRouter(prefix="/api/v1/resources", tags=["resources"])
@@ -61,7 +61,7 @@ def get_resources(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if current_user.role not in ["admin", "senior_associate"]:
+    if current_user.role.upper() not in ["ADMIN", "SENIOR_ASSOCIATE"]:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     result = resource_service.get_resources(
@@ -104,7 +104,7 @@ def update_resource(
     if not db_resource:
         raise NotFoundException()
 
-    if current_user.role == "user" and db_resource.user_id != current_user.id:
+    if current_user.role.upper() == "REGULAR_USER" and db_resource.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not allowed to edit other resources")
 
     r = resource_service.update_resource(db, employee_id, resource)

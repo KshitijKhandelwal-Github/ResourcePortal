@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import Optional
-from resourceportal.database.database import get_db
+from resourceportal.database import get_db
 from resourceportal.schemas.dashboard import (
     SummaryMetrics, SkillDistribution, LocationDistribution,
     ExperienceDistribution, TrainingMetrics, AvailabilityMetrics
 )
 from resourceportal.services import dashboard_service
 from resourceportal.utils.dependencies import require_role
-from resourceportal.models.user import User
+from resourceportal.models import User
 
 router = APIRouter(prefix="/api/v1/dashboard", tags=["dashboard"])
 
