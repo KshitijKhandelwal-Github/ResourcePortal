@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from resourceportal.database.database import get_db
 from resourceportal.services.auth_service import verify_password, create_access_token, get_password_hash
@@ -8,7 +8,13 @@ from resourceportal.schemas.user import LoginRequest, LoginResponse, UserCreate,
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 @router.post("/login", response_model=LoginResponse)
-def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+async def login(request: Request, db: Session = Depends(get_db)):
+    if "application/json" in request.headers.get("content-type", ""):
+        login_data = LoginRequest.model_validate(await request.json())
+    else:
+        form_data = await request.form()
+        login_data = LoginRequest.model_validate(dict(form_data))
+
     user = db.query(User).filter(User.username == login_data.username).first()
     if not user or not verify_password(login_data.password, user.hashed_password):
         raise HTTPException(
