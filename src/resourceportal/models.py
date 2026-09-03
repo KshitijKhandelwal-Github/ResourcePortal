@@ -8,6 +8,8 @@ from sqlalchemy import (
     UniqueConstraint,
     Index
 )
+from datetime import datetime
+from sqlalchemy import Column, DateTime
 
 from sqlalchemy.orm import relationship
 
@@ -189,15 +191,16 @@ class Resource(Base):
     )
 
     created_at = Column(
-        String,
+        DateTime,
         nullable=False,
-        default="CURRENT_TIMESTAMP"
+        default=lambda: datetime.now().replace(microsecond=0)
     )
 
     updated_at = Column(
-        String,
+        DateTime,
         nullable=False,
-        default="CURRENT_TIMESTAMP"
+        default=lambda: datetime.now().replace(microsecond=0),
+        onupdate=lambda: datetime.now().replace(microsecond=0)
     )
 
     __table_args__ = (
