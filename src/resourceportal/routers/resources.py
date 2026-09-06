@@ -1,3 +1,5 @@
+from os import name
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -5,7 +7,7 @@ from resourceportal.database import get_db
 from resourceportal.schemas.resource import ResourceOut, ResourceCreate, ResourceUpdate, ResourceListResponse, SkillBrief, ClusterBrief, LocationBrief
 from resourceportal.services import resource_service
 from resourceportal.utils.dependencies import get_current_user, require_role
-from resourceportal.models import User
+from resourceportal.models import ResourceSkill, User
 from resourceportal.utils.exceptions import NotFoundException
 
 router = APIRouter(prefix="/api/v1/resources", tags=["resources"])
@@ -19,11 +21,27 @@ def _resource_to_out(r) -> ResourceOut:
             if rs.skill:
                 skill_briefs.append(SkillBrief(id=rs.skill.id, name=rs.skill.name, category=rs.skill.category))
 
-    # Build cluster, location, primary_skill briefs
+    # Build cluster, location, and primary skill briefs
     cluster = ClusterBrief(id=r.cluster.id, name=r.cluster.name) if r.cluster else None
-    primary_skill = SkillBrief(id=r.primary_skill.id, name=r.primary_skill.name, category=r.primary_skill.category) if r.primary_skill else None
-    current_location = LocationBrief(id=r.current_location.id, city=r.current_location.city) if r.current_location else None
-    preferred_location = LocationBrief(id=r.preferred_location.id, city=r.preferred_location.city) if r.preferred_location else None
+    primary_resource_skill = next(
+        (
+            resource_skill
+            for resource_skill in r.skills
+            if resource_skill.skill_type == "PRIMARY" and resource_skill.skill
+        ),
+        None,
+    )
+    primary_skill = (
+        SkillBrief(
+            id=primary_resource_skill.skill.id,
+            name=primary_resource_skill.skill.name,
+            category=primary_resource_skill.skill.category,
+        )
+        if primary_resource_skill
+        else None
+    )
+    current_location = LocationBrief(id=r.current_location.id, name=r.current_location.name) if r.current_location else None
+    preferred_location = LocationBrief(id=r.preferred_location.id, name=r.preferred_location.name) if r.preferred_location else None
 
     return ResourceOut(
         id=r.id,
@@ -32,12 +50,16 @@ def _resource_to_out(r) -> ResourceOut:
         email=r.email,
         cluster_id=r.cluster_id,
         designation=r.designation,
-        years_of_experience=r.years_of_experience,
+        years_of_experience=r.years_experience,
         current_location_id=r.current_location_id,
         preferred_location_id=r.preferred_location_id,
         availability_status=r.availability_status,
-        primary_skill_id=r.primary_skill_id,
-        user_id=r.user_id,
+        primary_skill_id=(
+            primary_resource_skill.skill.id
+            if primary_resource_skill
+            else None
+        ),
+        user_id=r.user.id if r.user else None,
         created_at=r.created_at,
         updated_at=r.updated_at,
         cluster=cluster,
@@ -101,14 +123,28 @@ def update_resource(
     current_user: User = Depends(get_current_user),
 ):
     db_resource = resource_service.get_resource(db, employee_id)
+
     if not db_resource:
-        raise NotFoundException()
+        raise NotFoundException(detail="Resource not found")
 
-    if current_user.role.upper() == "REGULAR_USER" and db_resource.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not allowed to edit other resources")
+    linked_user = db_resource.user
 
-    r = resource_service.update_resource(db, employee_id, resource)
-    return _resource_to_out(r)
+    if (
+        current_user.role.upper() == "REGULAR_USER"
+        and (linked_user is None or linked_user.id != current_user.id)
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="Not allowed to edit other resources",
+        )
+
+    updated_resource = resource_service.update_resource(
+        db,
+        employee_id,
+        resource,
+    )
+
+    return _resource_to_out(updated_resource)
 
 @router.delete("/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_resource(

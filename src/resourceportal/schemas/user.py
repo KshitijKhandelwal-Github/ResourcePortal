@@ -5,7 +5,6 @@ class UserBase(BaseModel):
     username: str
     email: EmailStr
     role: str = "user"
-    cluster_id: Optional[int] = None
 
 class UserCreate(UserBase):
     password: str
