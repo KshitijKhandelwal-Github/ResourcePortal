@@ -15,7 +15,38 @@ OCMT Team Management Project Requirements.pdf
 # Environment variables
 .env
 
-frontend/
 frontend/node_modules/
 docs/frontend
 resource_portal.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Type-checker caches
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# IDE settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

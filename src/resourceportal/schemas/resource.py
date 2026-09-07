@@ -17,7 +17,7 @@ class ClusterBrief(BaseModel):
 
 class LocationBrief(BaseModel):
     id: int
-    city: str
+    name: str
     class Config:
         from_attributes = True
 
@@ -45,7 +45,7 @@ class ResourceCreate(BaseModel):
     preferred_location_id: Optional[int] = None
     availability_status: str = "Available"
     primary_skill_id: Optional[int] = None
-    user_id: Optional[int] = None
+    user_id: int
     secondary_skill_ids: Optional[List[int]] = []
 
 class ResourceUpdate(BaseModel):

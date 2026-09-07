@@ -336,6 +336,12 @@ class User(Base):
         nullable=False,
         default=lambda: datetime.now().replace(microsecond=0)
     )
+    updated_at = Column(
+    DateTime,
+    nullable=False,
+    default=lambda: datetime.now().replace(microsecond=0),
+    onupdate=lambda: datetime.now().replace(microsecond=0)
+    )
 
     __table_args__ = (
         CheckConstraint(
