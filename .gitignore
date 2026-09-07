@@ -15,7 +15,6 @@ OCMT Team Management Project Requirements.pdf
 # Environment variables
 .env
 
-frontend/
 frontend/node_modules/
 docs/frontend
 resource_portal.db
