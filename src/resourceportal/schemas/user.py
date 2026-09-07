@@ -10,6 +10,7 @@ class UserCreate(UserBase):
     password: str
 
 class UserUpdate(BaseModel):
+    username: str
     email: Optional[EmailStr] = None
     role: Optional[str] = None
     cluster_id: Optional[int] = None
