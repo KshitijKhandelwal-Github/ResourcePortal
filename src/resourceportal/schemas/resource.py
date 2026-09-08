@@ -17,7 +17,7 @@ class ClusterBrief(BaseModel):
 
 class LocationBrief(BaseModel):
     id: int
-    name: str
+    city: str
     class Config:
         from_attributes = True
 

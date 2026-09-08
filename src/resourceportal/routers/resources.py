@@ -40,8 +40,8 @@ def _resource_to_out(r) -> ResourceOut:
         if primary_resource_skill
         else None
     )
-    current_location = LocationBrief(id=r.current_location.id, name=r.current_location.name) if r.current_location else None
-    preferred_location = LocationBrief(id=r.preferred_location.id, name=r.preferred_location.name) if r.preferred_location else None
+    current_location = LocationBrief(id=r.current_location.id, city=r.current_location.city) if r.current_location else None
+    preferred_location = LocationBrief(id=r.preferred_location.id, city=r.preferred_location.city) if r.preferred_location else None
 
     return ResourceOut(
         id=r.id,

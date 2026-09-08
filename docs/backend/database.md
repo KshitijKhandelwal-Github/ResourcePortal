@@ -2,9 +2,9 @@
 
 ## Overview
 
-The [`database.py`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py) file establishes and manages all connections between the Python application and the relational database via SQLAlchemy.
+The [`database.py`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py) file establishes and manages all connections between the Python application and the relational database via SQLAlchemy.
 
-Think of [`database.py`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py) like the **plumbing and tap system of a building**:
+Think of [`database.py`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py) like the **plumbing and tap system of a building**:
 - The **`engine`** is the main water pipeline connecting the building to the municipal water reservoir (the database).
 - The **`SessionLocal`** is the valve or tap mechanism capable of dispensing clean water on demand.
 - The **`get_db()`** function is a person turning on the tap when an API request arrives to fetch or store data, and guaranteeing the tap is turned off tightly (`db.close()`) once the request finishes so no water (database connections) leaks out.
@@ -24,9 +24,9 @@ from resourceportal.config import settings
 
 Here is why each import is needed:
 
-- **[`create_engine`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L1)**: Core SQLAlchemy function that sets up the database engine. It manages connection pooling, dialect translation (converting Python SQL expressions into SQLite or PostgreSQL syntax), and low-level communication.
-- **[`declarative_base`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L2)**: Factory function that returns a base class. When your Python models (like `User` or `Resource`) inherit from this class, SQLAlchemy automatically maps them to database tables.
-- **[`sessionmaker`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L3)**: A factory for creating new `Session` objects. Sessions are the workspace where you stage database queries and transactions.
+- **[`create_engine`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L1)**: Core SQLAlchemy function that sets up the database engine. It manages connection pooling, dialect translation (converting Python SQL expressions into SQLite or PostgreSQL syntax), and low-level communication.
+- **[`declarative_base`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L2)**: Factory function that returns a base class. When your Python models (like `User` or `Resource`) inherit from this class, SQLAlchemy automatically maps them to database tables.
+- **[`sessionmaker`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L3)**: A factory for creating new `Session` objects. Sessions are the workspace where you stage database queries and transactions.
 - **[`settings`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/config.py#L11)**: The application configuration singleton, imported to obtain `DATABASE_URL`.
 
 ---
@@ -40,7 +40,7 @@ engine = create_engine(
 ```
 
 ### What it does
-Creates the central [`engine`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L7-L9) object that points to the database specified by `settings.DATABASE_URL`.
+Creates the central [`engine`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L7-L9) object that points to the database specified by `settings.DATABASE_URL`.
 
 ### Why it's needed
 All database queries, schema migrations, and transactions rely on an underlying connection engine.
@@ -59,7 +59,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 ```
 
 ### What it does
-Creates a customized session class called [`SessionLocal`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L10). Calling `SessionLocal()` instantiates an individual database session.
+Creates a customized session class called [`SessionLocal`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L10). Calling `SessionLocal()` instantiates an individual database session.
 
 ### Why it's needed
 In database programming, you don't use raw connections directly. You use **sessions** to track changes, run queries, and wrap operations inside transactions.
@@ -78,7 +78,7 @@ Base = declarative_base()
 ```
 
 ### What it does
-Creates the base class [`Base`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L12) that all database model classes inherit from.
+Creates the base class [`Base`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L12) that all database model classes inherit from.
 
 ### Why it's needed
 SQLAlchemy uses the **Declarative System**. Instead of writing raw `CREATE TABLE` SQL statements, you define Python classes:
