@@ -59,11 +59,14 @@ class Location(Base):
         autoincrement=True
     )
 
-    name = Column(
+    city = Column(
         String,
         nullable=False,
         unique=True
     )
+    
+    state = Column(String, nullable=True)
+    country = Column(String, nullable=True)
 
     current_resources = relationship(
         "Resource",

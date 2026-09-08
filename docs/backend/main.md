@@ -27,10 +27,10 @@ Here is why each import is needed:
 
 - **[`FastAPI`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/main.py#L1)**: The core Python class from the FastAPI framework used to create and configure the web application.
 - **[`CORSMiddleware`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/main.py#L2)**: Middleware that manages Cross-Origin Resource Sharing (CORS). It allows browsers running a frontend website on one origin (e.g., `http://localhost:5173`) to communicate with this backend API running on another origin (e.g., `http://localhost:8000`).
-- **[`engine`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L7-L9)**: The SQLAlchemy database connection engine that executes SQL statements against the configured database.
-- **[`Base`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L12)**: The declarative base class that keeps track of all database models (tables) defined in the application.
-- **[`get_db`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L14-L19)**: A generator function providing isolated database sessions.
-- **[`seed_db`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/seed.py#L13-L141)**: A utility function that populates the database with default sample data (users, clusters, skills, resources, etc.) if it hasn't been seeded yet.
+- **[`engine`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L7-L9)**: The SQLAlchemy database connection engine that executes SQL statements against the configured database.
+- **[`Base`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L12)**: The declarative base class that keeps track of all database models (tables) defined in the application.
+- **[`get_db`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L14-L19)**: A generator function providing isolated database sessions.
+- **[`seed_db`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/population.py#L13-L141)**: A utility function that populates the database with default sample data (users, clusters, skills, resources, etc.) if it hasn't been seeded yet.
 - **`resourceportal.routers.*`**: The 9 feature modules containing individual API endpoints:
   - `auth`: Login and registration routes.
   - `resources`: Resource profiles, skills, and availability management.

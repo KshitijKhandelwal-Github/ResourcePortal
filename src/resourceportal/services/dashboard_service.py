@@ -116,7 +116,7 @@ def get_location_distribution(
     availability_status=None,
 ):
     query = db.query(
-        Location.name,
+        Location.city,
         func.count(Resource.id),
     ).join(
         Resource,
@@ -141,7 +141,7 @@ def get_location_distribution(
             Resource.availability_status == availability_status
         )
 
-    results = query.group_by(Location.name).all()
+    results = query.group_by(Location.city).all()
 
     return [
         {"location_name": location_name, "count": count}

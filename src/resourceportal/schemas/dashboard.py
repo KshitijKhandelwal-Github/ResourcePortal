@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class SummaryMetrics(BaseModel):
     total: int
@@ -13,6 +14,7 @@ class SkillDistribution(BaseModel):
 
 class LocationDistribution(BaseModel):
     location_name: str
+    city: Optional[str] = None
     count: int
 
 class ExperienceDistribution(BaseModel):
