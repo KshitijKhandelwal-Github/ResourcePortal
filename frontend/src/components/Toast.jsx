@@ -6,7 +6,7 @@ const Toast = ({ message, type = 'success', onClose }) => {
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const accentColor = type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#10b981';
+  const accentColor = type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#86BC25';
 
   return (
     <div style={{
