@@ -45,7 +45,7 @@ class ResourceCreate(BaseModel):
     preferred_location_id: Optional[int] = None
     availability_status: str = "Available"
     primary_skill_id: Optional[int] = None
-    user_id: int
+    user_id: Optional[int] = None
     secondary_skill_ids: Optional[List[int]] = []
 
 class ResourceUpdate(BaseModel):

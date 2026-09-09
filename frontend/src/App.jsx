@@ -53,7 +53,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="profile" element={
-              <ProtectedRoute allowedRoles={['user', 'admin', 'senior_associate']}>
+              <ProtectedRoute allowedRoles={['user', 'regular_user', 'admin', 'senior_associate']}>
                 <ProfilePage />
               </ProtectedRoute>
             } />

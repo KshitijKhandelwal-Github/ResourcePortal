@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = () => {
   const { user } = useAuth();
-  const role = user?.role;
+  const role = user?.role?.toLowerCase();
 
   return (
     <div className="sidebar">

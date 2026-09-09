@@ -63,7 +63,8 @@ const ResourceDetailPage = () => {
     }
   };
 
-  const canEdit = user?.role === 'admin' || user?.role === 'senior_associate';
+  const role = user?.role?.toLowerCase();
+  const canCreate = role === 'admin' || role === 'senior_associate';
 
   if (loading) return <LoadingSpinner />;
   if (!resource) return <div className="empty-state">Resource not found</div>;
@@ -80,7 +81,7 @@ const ResourceDetailPage = () => {
         <h1>{resource.name}</h1>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button className="btn-secondary" onClick={() => navigate('/resources')}>← Back</button>
-          {canEdit && (
+          {canCreate && (
             <button className="btn-primary" onClick={() => navigate(`/resources/${employeeId}/edit`)}>Edit Resource</button>
           )}
           {user?.role === 'admin' && (

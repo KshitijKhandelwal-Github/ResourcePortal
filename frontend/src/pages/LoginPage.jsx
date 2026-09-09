@@ -11,7 +11,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   if (user) {
-    const dest = user.role === 'user' ? '/profile' : '/dashboard';
+    const role = user.role?.toLowerCase();
+    const dest = role === 'user' || role === 'regular_user'
+      ? '/profile'
+      : '/dashboard';
     return <Navigate to={dest} replace />;
   }
 

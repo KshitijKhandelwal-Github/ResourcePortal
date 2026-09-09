@@ -52,16 +52,16 @@ def populate_database():
 
         if db.query(Location).count() == 0:
             locations = [
-                Location(city="Chennai"),
-                Location(city="Bangalore"),
-                Location(city="Hyderabad"),
-                Location(city="Pune"),
-                Location(city="Mumbai"),
-                Location(city="Delhi"),
-                Location(city="Kolkata"),
-                Location(city="Noida"),
-                Location(city="Gurgaon"),
-                Location(city="Coimbatore")
+                Location(city="Chennai", state="Tamil Nadu", country="India"),
+                Location(city="Bangalore", state="Karnataka", country="India"),
+                Location(city="Hyderabad", state="Telangana", country="India"),
+                Location(city="Pune", state="Maharashtra", country="India"),
+                Location(city="Mumbai", state="Maharashtra", country="India"),
+                Location(city="Delhi", state="Delhi", country="India"),
+                Location(city="Kolkata", state="West Bengal", country="India"),
+                Location(city="Noida", state="Uttar Pradesh", country="India"),
+                Location(city="Gurgaon", state="Haryana", country="India"),
+                Location(city="Coimbatore", state="Tamil Nadu", country="India")
             ]
 
             db.add_all(locations)
@@ -371,7 +371,7 @@ def populate_database():
                     resource_id=1,
                     skill_id=3,
                     training_name="Advanced FastAPI",
-                    status="COMPLETED",
+                    status="Completed",
                     start_date="2026-01-10",
                     completion_date="2026-02-10",
                     description="Advanced backend development using FastAPI"
@@ -380,7 +380,7 @@ def populate_database():
                     resource_id=2,
                     skill_id=2,
                     training_name="Advanced Java",
-                    status="COMPLETED",
+                    status="Completed",
                     start_date="2025-10-01",
                     completion_date="2025-11-01",
                     description="Advanced Java development"
@@ -389,7 +389,7 @@ def populate_database():
                     resource_id=3,
                     skill_id=7,
                     training_name="PyTorch Deep Learning",
-                    status="IN_PROGRESS",
+                    status="In Progress",
                     start_date="2026-08-01",
                     completion_date=None,
                     description="Deep learning using PyTorch"
@@ -398,7 +398,7 @@ def populate_database():
                     resource_id=4,
                     skill_id=4,
                     training_name="Advanced React",
-                    status="COMPLETED",
+                    status="Completed",
                     start_date="2026-02-01",
                     completion_date="2026-03-01",
                     description="Advanced React development"
@@ -407,7 +407,7 @@ def populate_database():
                     resource_id=5,
                     skill_id=10,
                     training_name="Docker and Kubernetes",
-                    status="IN_PROGRESS",
+                    status="In Progress",
                     start_date="2026-08-15",
                     completion_date=None,
                     description="Containerization and orchestration"
@@ -416,7 +416,7 @@ def populate_database():
                     resource_id=6,
                     skill_id=8,
                     training_name="Advanced SQL",
-                    status="COMPLETED",
+                    status="Completed",
                     start_date="2025-09-01",
                     completion_date="2025-10-01",
                     description="Advanced SQL and database concepts"
@@ -425,7 +425,7 @@ def populate_database():
                     resource_id=7,
                     skill_id=3,
                     training_name="FastAPI Backend Development",
-                    status="PLANNED",
+                    status="Planned",
                     start_date="2026-10-01",
                     completion_date=None,
                     description="Backend API development"
@@ -434,7 +434,7 @@ def populate_database():
                     resource_id=8,
                     skill_id=9,
                     training_name="AWS Cloud Practitioner",
-                    status="COMPLETED",
+                    status="Completed",
                     start_date="2026-01-01",
                     completion_date="2026-02-01",
                     description="AWS cloud fundamentals"
@@ -443,7 +443,7 @@ def populate_database():
                     resource_id=9,
                     skill_id=8,
                     training_name="SQL Testing",
-                    status="PLANNED",
+                    status="Planned",
                     start_date="2026-11-01",
                     completion_date=None,
                     description="Database testing"
@@ -452,7 +452,7 @@ def populate_database():
                     resource_id=10,
                     skill_id=1,
                     training_name="Advanced Python",
-                    status="IN_PROGRESS",
+                    status="In Progress",
                     start_date="2026-08-20",
                     completion_date=None,
                     description="Advanced Python programming"
