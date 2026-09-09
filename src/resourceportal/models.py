@@ -524,7 +524,7 @@ class Training(Base):
     __table_args__ = (
         CheckConstraint(
             "status IN "
-            "('COMPLETED', 'IN_PROGRESS', 'PLANNED')",
+            "('Completed', 'In Progress', 'Planned')",
             name="check_training_status"
         ),
 

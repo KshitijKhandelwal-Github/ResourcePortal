@@ -115,9 +115,9 @@ const UsersTab = ({ setToast }) => {
                 <td>
                   <select value={u.role} onChange={e => changeRole(u, e.target.value)}
                     style={{ width: 'auto', padding: '4px 10px', fontSize: '12px' }}>
-                    <option value="admin">Admin</option>
-                    <option value="senior_associate">Senior Associate</option>
-                    <option value="user">User</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="SENIOR_ASSOCIATE">Senior Associate</option>
+                    <option value="REGULAR_USER">User</option>
                   </select>
                 </td>
                 <td>
