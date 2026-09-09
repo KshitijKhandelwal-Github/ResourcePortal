@@ -1,4 +1,4 @@
-const StatCard = ({ title, value, color = '#10b981' }) => {
+const StatCard = ({ title, value, color = '#86BC25' }) => {
   return (
     <div style={{
       background: 'var(--white)',
