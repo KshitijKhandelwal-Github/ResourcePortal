@@ -2,7 +2,9 @@ from pydantic import BaseModel
 from typing import Optional
 
 class LocationBase(BaseModel):
-    name: str
+    city: str
+    state: Optional[str] = None
+    country: Optional[str] = None
 
 class LocationCreate(LocationBase):
     pass

@@ -30,8 +30,8 @@ Here is why each import is needed:
 - **[`OAuth2PasswordBearer`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/utils/dependencies.py#L2)**: Security helper class that inspects incoming HTTP requests for an `Authorization: Bearer <token>` header, extracts the token string, and integrates with FastAPI's automatic Swagger/OpenAPI documentation.
 - **`jwt` (PyJWT)**: Decodes and cryptographically validates JSON Web Tokens using `settings.SECRET_KEY`.
 - **[`Session`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/utils/dependencies.py#L4)**: SQLAlchemy database session type hint.
-- **[`get_db`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database/database.py#L14-L19)**: The database session generator dependency.
-- **[`User`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/models/user.py)**: The SQLAlchemy database model representing user accounts.
+- **[`get_db`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/database.py#L14-L19)**: The database session generator dependency.
+- **[`User`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/models.py)**: The SQLAlchemy database model representing user accounts.
 - **[`settings`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/config.py#L11)**: Application settings providing the `SECRET_KEY` required to decode and verify JWT signatures.
 
 ---
@@ -75,12 +75,12 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 ```
 
-- **What it does**: Validates the JWT token from the client, identifies the user, retrieves their full record from the database, and returns the [`User`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/models/user.py) object.
+- **What it does**: Validates the JWT token from the client, identifies the user, retrieves their full record from the database, and returns the [`User`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/models.py) object.
 - **Why it's needed**: Any protected endpoint (e.g. updating profile details, viewing internal resources) needs to know who is making the request and verify their credentials are authentic.
 - **Parameters**:
   - `token` (`str`): Injected automatically by `Depends(oauth2_scheme)`.
   - `db` (`Session`): Injected database session via `Depends(get_db)`.
-- **Returns**: [`User`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/models/user.py) - The authenticated database user object.
+- **Returns**: [`User`](file:///Users/kshitijkhandelwal_1/VSCode/ResourcePortal/ResourcePortal/src/resourceportal/models.py) - The authenticated database user object.
 - **Step-by-Step Logic**:
   1. **Prepare Exception**: Defines a reusable `credentials_exception` with HTTP status 401 Unauthorized and standard `WWW-Authenticate: Bearer` challenge header.
   2. **Decode & Verify Signature**: Calls `jwt.decode()`. PyJWT verifies that the token was signed with `settings.SECRET_KEY`, that the algorithm is `"HS256"`, and that the token's expiration timestamp (`exp`) has not passed.

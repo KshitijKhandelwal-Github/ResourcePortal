@@ -52,16 +52,16 @@ def populate_database():
 
         if db.query(Location).count() == 0:
             locations = [
-                Location(name="Chennai"),
-                Location(name="Bangalore"),
-                Location(name="Hyderabad"),
-                Location(name="Pune"),
-                Location(name="Mumbai"),
-                Location(name="Delhi"),
-                Location(name="Kolkata"),
-                Location(name="Noida"),
-                Location(name="Gurgaon"),
-                Location(name="Coimbatore")
+                Location(city="Chennai"),
+                Location(city="Bangalore"),
+                Location(city="Hyderabad"),
+                Location(city="Pune"),
+                Location(city="Mumbai"),
+                Location(city="Delhi"),
+                Location(city="Kolkata"),
+                Location(city="Noida"),
+                Location(city="Gurgaon"),
+                Location(city="Coimbatore")
             ]
 
             db.add_all(locations)
