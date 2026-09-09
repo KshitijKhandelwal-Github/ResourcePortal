@@ -7,7 +7,16 @@ import { getLocations } from '../api/locations';
 import StatCard from '../components/StatCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-const COLORS = ['#10b981', '#059669', '#34d399', '#047857', '#065f46', '#18181b', '#3f3f46', '#71717a'];
+const COLORS = [
+  '#86BC25', // Primary green
+  '#6F9F1D', // Dark green
+  '#A8D957', // Light green
+  '#527B12', // Darker green
+  '#C6E58A', // Very light green
+  '#000000', // Black
+  '#18181B', // Dark gray
+  '#FFFFFF'  // White
+];
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -140,9 +149,9 @@ const DashboardPage = () => {
       {summary && (
         <div className="stat-grid">
           <StatCard title="Total Resources" value={summary.total || 0} color="#09090b" />
-          <StatCard title="Available" value={summary.available || 0} color="#10b981" />
+          <StatCard title="Available" value={summary.available || 0} color="#86BC25" />
           <StatCard title="Allocated" value={summary.allocated || 0} color="#18181b" />
-          <StatCard title="On Training" value={summary.on_training || 0} color="#059669" />
+          <StatCard title="On Training" value={summary.on_training || 0} color="#86BC25" />
           <StatCard title="On Leave" value={summary.on_leave || 0} color="#71717a" />
         </div>
       )}
@@ -159,7 +168,7 @@ const DashboardPage = () => {
                 <XAxis dataKey="skill_name" tick={{ fontSize: 11, fill: '#71717a' }} angle={-30} textAnchor="end" height={60} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} allowDecimals={false} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" fill="#10b981" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="count" fill="#86BC25" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : <div className="empty-state">No data available</div>}
@@ -175,7 +184,7 @@ const DashboardPage = () => {
                 <XAxis dataKey="location_name" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} allowDecimals={false} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" fill="#059669" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="count" fill="#86BC25" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : <div className="empty-state">No data available</div>}
@@ -191,7 +200,7 @@ const DashboardPage = () => {
                 <XAxis dataKey="range" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} allowDecimals={false} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" fill="#047857" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="count" fill="#86BC25" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : <div className="empty-state">No data available</div>}
@@ -225,7 +234,7 @@ const DashboardPage = () => {
               <XAxis type="number" tick={{ fontSize: 12, fill: '#71717a' }} allowDecimals={false} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="status" tick={{ fontSize: 12, fill: '#71717a' }} width={100} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" fill="#10b981" radius={[0, 6, 6, 0]} />
+              <Bar dataKey="count" fill="#86BC25" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
