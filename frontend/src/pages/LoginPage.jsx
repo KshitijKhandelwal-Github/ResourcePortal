@@ -11,7 +11,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   if (user) {
-    const dest = user.role === 'user' ? '/profile' : '/dashboard';
+    const role = user.role?.toLowerCase();
+    const dest = role === 'user' || role === 'regular_user'
+      ? '/profile'
+      : '/dashboard';
     return <Navigate to={dest} replace />;
   }
 
@@ -39,7 +42,7 @@ const LoginPage = () => {
       <div className="login-card">
         <div className="login-card-accent" />
         <div style={{ textCenter: 'center', marginBottom: '8px' }}>
-          <span style={{ fontSize: '32px', color: '#10b981' }}>❖</span>
+          <span style={{ fontSize: '32px', color: '#86BC25' }}>❖</span>
         </div>
         <h1>Resource Portal</h1>
         <p>Sign in to manage resources & skills</p>

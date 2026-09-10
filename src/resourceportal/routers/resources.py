@@ -7,7 +7,7 @@ from resourceportal.database import get_db
 from resourceportal.schemas.resource import ResourceOut, ResourceCreate, ResourceUpdate, ResourceListResponse, SkillBrief, ClusterBrief, LocationBrief
 from resourceportal.services import resource_service
 from resourceportal.utils.dependencies import get_current_user, require_role
-from resourceportal.models import ResourceSkill, User
+from resourceportal.models import Resource, ResourceSkill, User
 from resourceportal.utils.exceptions import NotFoundException
 
 router = APIRouter(prefix="/api/v1/resources", tags=["resources"])
@@ -83,11 +83,33 @@ def get_resources(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if current_user.role.upper() not in ["ADMIN", "SENIOR_ASSOCIATE"]:
+    if current_user.role.upper() not in ["ADMIN", "SENIOR_ASSOCIATE", "REGULAR_USER"]:
         raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    linked_resource_id = None
+    if current_user.role.upper() == "REGULAR_USER":
+        linked_resource_id = current_user.resource_id
+        if linked_resource_id is None:
+            linked_resource = (
+                db.query(Resource)
+                .filter(Resource.email == current_user.email)
+                .first()
+            )
+            if linked_resource:
+                linked_resource_id = linked_resource.id
+                current_user.resource_id = linked_resource.id
+                db.commit()
+
+        if linked_resource_id is None:
+            raise NotFoundException(detail="No resource profile is linked to this user")
 
     result = resource_service.get_resources(
         db, skip=skip, limit=limit,
+        resource_id=(
+            int(linked_resource_id)  # type: ignore[arg-type]
+            if linked_resource_id is not None
+            else None
+        ),
         cluster_id=cluster_id, skill_id=skill_id,
         availability_status=availability_status,
         location_id=location_id,
@@ -104,6 +126,25 @@ def get_resource(employee_id: str, db: Session = Depends(get_db), current_user: 
     db_resource = resource_service.get_resource(db, employee_id)
     if not db_resource:
         raise NotFoundException()
+
+    if current_user.role.upper() == "REGULAR_USER":
+        linked_resource_id = current_user.resource_id
+        if linked_resource_id is None:
+            linked_resource = (
+                db.query(Resource)
+                .filter(Resource.email == current_user.email)
+                .first()
+            )
+            linked_resource_id = linked_resource.id if linked_resource else None
+
+        if linked_resource_id is None:
+            raise NotFoundException(detail="No resource profile is linked to this user")
+        if int(db_resource.id) != int(linked_resource_id):  # type: ignore[arg-type]
+            raise HTTPException(
+                status_code=403,
+                detail="Not allowed to view other resources",
+            )
+
     return _resource_to_out(db_resource)
 
 @router.post("", response_model=ResourceOut, status_code=status.HTTP_201_CREATED)

@@ -16,13 +16,22 @@ def _base_query(db: Session):
         joinedload(Resource.preferred_location),
     )
 
-def get_resources(db: Session, skip: int = 0, limit: int = 20, **filters):
+def get_resources(
+    db: Session,
+    skip: int = 0,
+    limit: int = 20,
+    resource_id: int | None = None,
+    **filters,
+):
     query = db.query(Resource).options(
         joinedload(Resource.cluster),
         joinedload(Resource.skills).joinedload(ResourceSkill.skill),
         joinedload(Resource.current_location),
         joinedload(Resource.preferred_location),
     )
+
+    if resource_id is not None:
+        query = query.filter(Resource.id == resource_id)
 
     if filters.get("cluster_id"):
         query = query.filter(Resource.cluster_id == filters["cluster_id"])
@@ -42,10 +51,7 @@ def get_resources(db: Session, skip: int = 0, limit: int = 20, **filters):
         query = query.filter(Resource.availability_status == filters["availability_status"])
     if filters.get("location_id"):
         query = query.filter(
-            or_(
-                Resource.current_location_id == filters["location_id"],
-                Resource.preferred_location_id == filters["location_id"],
-            )
+            Resource.current_location_id == filters["location_id"],
         )
     if filters.get("min_experience"):
         query = query.filter(Resource.years_experience >= float(filters["min_experience"]))
@@ -56,7 +62,7 @@ def get_resources(db: Session, skip: int = 0, limit: int = 20, **filters):
         query = query.filter(or_(Resource.name.ilike(search), Resource.employee_id.ilike(search)))
 
     total = query.count()
-    items = query.order_by(Resource.name).offset(skip).limit(limit).all()
+    items = query.order_by(Resource.employee_id.asc(),Resource.name.asc()).offset(skip).limit(limit).all()
 
     # Convert ResourceSkill relationships to skill briefs
     for item in items:
@@ -72,17 +78,23 @@ def get_resource(db: Session, employee_id: str):
     return resource
 
 def create_resource(db: Session, resource: ResourceCreate):
-    user = db.query(User).filter(User.id == resource.user_id).first()
-    # if not user:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail="Registered user not found",
-    #     )
-    # if user.resource_id is not None:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_409_CONFLICT,
-    #         detail="This user is already linked to a resource",
-    #     )
+    user_query = db.query(User)
+    if resource.user_id is not None:
+        user_query = user_query.filter(User.id == resource.user_id)
+    else:
+        user_query = user_query.filter(User.email == resource.email)
+
+    user = user_query.first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No registered user matches this resource email",
+        )
+    if user.resource_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This user is already linked to a resource",
+        )
     existing_resource = db.query(Resource).filter(
         or_(
             Resource.employee_id == resource.employee_id,

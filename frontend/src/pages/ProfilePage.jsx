@@ -33,7 +33,7 @@ const ProfilePage = () => {
     training_name: '', skill_id: '', status: 'Planned', start_date: '', completion_date: '',
   });
   const [certForm, setCertForm] = useState({
-    name: '', issuing_organization: '', issue_date: '', expiry_date: '',
+    certification_name: '', issuing_organization: '', issue_date: '', expiry_date: '',
   });
 
   const loadSkills = async () => {
@@ -47,10 +47,9 @@ const ProfilePage = () => {
     setLoading(true);
     try {
       // Find the resource linked to the current user
-      const res = await getResources({ search: user?.username || '', limit: 100 });
+      const res = await getResources({ limit: 1 });
       const items = res.data.items || res.data;
-      // Try to match by user_id or by name/email
-      const myResource = items.find(r => r.user_id === user?.id) || items[0];
+      const myResource = items[0];
 
       if (myResource) {
         setResource(myResource);
@@ -106,7 +105,7 @@ const ProfilePage = () => {
       await addCertification(resource.employee_id, payload);
       setToast({ message: 'Certification added successfully', type: 'success' });
       setShowCertModal(false);
-      setCertForm({ name: '', issuing_organization: '', issue_date: '', expiry_date: '' });
+      setCertForm({ certification_name: '', issuing_organization: '', issue_date: '', expiry_date: '' });
       const certRes = await getCertifications(resource.employee_id);
       setCertifications(certRes.data);
     } catch (err) {
@@ -135,6 +134,12 @@ const ProfilePage = () => {
           <div>
             <label>Email</label>
             <div style={{ color: 'var(--dark-gray)' }}>{user?.email}</div>
+          </div>
+          <div>
+            <label>Employee ID</label>
+            <div style={{ fontWeight: 600, color: 'var(--black)' }}>
+              {user?.employee_id || '—'}
+            </div>
           </div>
           <div>
             <label>Role</label>
@@ -199,7 +204,7 @@ const ProfilePage = () => {
                   <tbody>
                     {certifications.map(c => (
                       <tr key={c.id}>
-                        <td style={{ fontWeight: 500 }}>{c.name}</td>
+                        <td style={{ fontWeight: 500 }}>{c.certification_name}</td>
                         <td>{c.issuing_organization || '—'}</td>
                         <td>{c.issue_date || '—'}</td>
                         <td>{c.expiry_date || '—'}</td>
@@ -261,7 +266,7 @@ const ProfilePage = () => {
         <form onSubmit={handleAddCert}>
           <div className="form-group">
             <label>Certification Name *</label>
-            <input value={certForm.name} onChange={e => setCertForm(p => ({ ...p, name: e.target.value }))} required />
+            <input value={certForm.certification_name} onChange={e => setCertForm(p => ({ ...p, certification_name: e.target.value }))} required />
           </div>
           <div className="form-group">
             <label>Issuing Organization</label>

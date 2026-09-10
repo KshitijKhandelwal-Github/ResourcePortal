@@ -106,7 +106,8 @@ const ResourcesPage = () => {
   };
 
   const totalPages = Math.ceil(total / limit);
-  const canCreate = user?.role === 'admin' || user?.role === 'senior_associate';
+  const role = user?.role?.toLowerCase();
+  const canCreate = role === 'admin' || role === 'senior_associate';
 
   return (
     <div>
@@ -206,7 +207,7 @@ const ResourcesPage = () => {
                         <td onClick={e => e.stopPropagation()}>
                           <button className="btn-secondary btn-sm" style={{ marginRight: '6px' }}
                             onClick={() => navigate(`/resources/${r.employee_id}/edit`)}>Edit</button>
-                          {user?.role === 'admin' && (
+                          {role === 'admin' && (
                             <button className="btn-danger btn-sm"
                               onClick={() => handleDelete(r.employee_id, r.name)}>Delete</button>
                           )}

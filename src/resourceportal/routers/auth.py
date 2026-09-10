@@ -31,8 +31,12 @@ def login(login_data: LoginRequest, db: Session = Depends(get_db)):
             username=user.username,
             email=user.email,
             role=user.role,
-            cluster_id=None,
             is_active=user.is_active,
+            employee_id=(
+                user.resource.employee_id
+                if user.resource
+                else None
+            ),
         ),
     )
 
@@ -51,7 +55,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     new_user = User(
         username=user.username,
         email=user.email,
-        role=user.role,
+        role={
+            "admin": "ADMIN",
+            "senior_associate": "SENIOR_ASSOCIATE",
+            "user": "REGULAR_USER",
+            "regular_user": "REGULAR_USER",
+        }.get(user.role.strip().lower(), user.role),
         password_hash=hashed_password,
     )
     db.add(new_user)

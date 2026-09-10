@@ -46,7 +46,7 @@ const UsersTab = ({ setToast }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ username: '', email: '', password: '', role: 'user' });
+  const [form, setForm] = useState({ username: '', email: '', password: '', role: 'REGULAR_USER' });
 
   useEffect(() => { loadUsers(); }, []);
 
@@ -68,7 +68,7 @@ const UsersTab = ({ setToast }) => {
       await registerUser(form);
       setToast({ message: 'User created successfully', type: 'success' });
       setShowModal(false);
-      setForm({ username: '', email: '', password: '', role: 'user' });
+      setForm({ username: '', email: '', password: '', role: 'REGULAR_USER' });
       loadUsers();
     } catch (err) {
       setToast({ message: err.response?.data?.detail || 'Failed to create user', type: 'error' });
@@ -115,9 +115,9 @@ const UsersTab = ({ setToast }) => {
                 <td>
                   <select value={u.role} onChange={e => changeRole(u, e.target.value)}
                     style={{ width: 'auto', padding: '4px 10px', fontSize: '12px' }}>
-                    <option value="admin">Admin</option>
-                    <option value="senior_associate">Senior Associate</option>
-                    <option value="user">User</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="SENIOR_ASSOCIATE">Senior Associate</option>
+                    <option value="REGULAR_USER">User</option>
                   </select>
                 </td>
                 <td>
