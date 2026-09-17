@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -41,9 +41,6 @@ const LoginPage = () => {
     <div className="login-page">
       <div className="login-card">
         <div className="login-card-accent" />
-        <div style={{ textCenter: 'center', marginBottom: '8px' }}>
-          <span style={{ fontSize: '32px', color: '#86BC25' }}>❖</span>
-        </div>
         <h1>Resource Portal</h1>
         <p>Sign in to manage resources & skills</p>
         {error && <div className="login-error">{error}</div>}
@@ -71,6 +68,12 @@ const LoginPage = () => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+        <p style={{ textAlign: 'center', marginTop: '20px', marginBottom: 0, fontSize: '13.5px', color: 'var(--gray)' }}>
+          Don't have an account?{' '}
+          <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+            Create Account
+          </Link>
+        </p>
       </div>
     </div>
   );

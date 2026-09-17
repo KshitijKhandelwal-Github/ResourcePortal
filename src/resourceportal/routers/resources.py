@@ -151,9 +151,26 @@ def get_resource(employee_id: str, db: Session = Depends(get_db), current_user: 
 def create_resource(
     resource: ResourceCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role(["admin", "senior_associate"])),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.role.upper() == "REGULAR_USER":
+        if resource.user_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="Not allowed to create resources for other users",
+            )
+        if resource.email != current_user.email:
+            raise HTTPException(
+                status_code=400,
+                detail="Email must match your user account email",
+            )
+
     r = resource_service.create_resource(db, resource)
+    
+    if current_user.role.upper() == "REGULAR_USER" and current_user.resource_id is None:
+        current_user.resource_id = r.id
+        db.commit()
+
     return _resource_to_out(r)
 
 @router.put("/{employee_id}", response_model=ResourceOut)

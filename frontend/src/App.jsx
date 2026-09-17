@@ -11,6 +11,7 @@ import ResourceDetailPage from './pages/ResourceDetailPage';
 import ResourceFormPage from './pages/ResourceFormPage';
 import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
+import RegisterPage from './pages/RegisterPage';
 
 import './App.css';
 
@@ -20,6 +21,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={

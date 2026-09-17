@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getResources } from '../api/resources';
+import { getResources, updateResource, createResource } from '../api/resources';
 import { getTraining, addTraining } from '../api/training';
 import { getCertifications, addCertification } from '../api/certifications';
 import { getSkills } from '../api/skills';
+import { getClusters } from '../api/clusters';
+import { getLocations } from '../api/locations';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Toast from '../components/Toast';
 import Modal from '../components/Modal';
@@ -23,30 +25,49 @@ const ProfilePage = () => {
   const [training, setTraining] = useState([]);
   const [certifications, setCertifications] = useState([]);
   const [skills, setSkills] = useState([]);
+  const [clusters, setClusters] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
 
-  // Modal states
+  // Create profile modal
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({});
+  const [createLoading, setCreateLoading] = useState(false);
+
+  // Edit profile modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
+
+  // Training modal
   const [showTrainingModal, setShowTrainingModal] = useState(false);
-  const [showCertModal, setShowCertModal] = useState(false);
   const [trainingForm, setTrainingForm] = useState({
     training_name: '', skill_id: '', status: 'Planned', start_date: '', completion_date: '',
   });
+
+  // Certification modal
+  const [showCertModal, setShowCertModal] = useState(false);
   const [certForm, setCertForm] = useState({
     certification_name: '', issuing_organization: '', issue_date: '', expiry_date: '',
   });
 
-  const loadSkills = async () => {
+  const loadReferenceData = async () => {
     try {
-      const res = await getSkills();
-      setSkills(res.data);
+      const [skillsRes, clustersRes, locationsRes] = await Promise.all([
+        getSkills(),
+        getClusters(),
+        getLocations(),
+      ]);
+      setSkills(skillsRes.data);
+      setClusters(clustersRes.data);
+      setLocations(locationsRes.data);
     } catch (err) { /* ignore */ }
   };
 
   const loadProfile = useCallback(async () => {
     setLoading(true);
     try {
-      // Find the resource linked to the current user
       const res = await getResources({ limit: 1 });
       const items = res.data.items || res.data;
       const myResource = items[0];
@@ -71,8 +92,110 @@ const ProfilePage = () => {
 
   useEffect(() => {
     loadProfile();
-    loadSkills();
+    loadReferenceData();
   }, [loadProfile]);
+
+  const openCreateModal = () => {
+    setCreateForm({
+      employee_id: user?.username || '',
+      email: user?.email || '',
+      name: '',
+      designation: '',
+      years_of_experience: '',
+      cluster_id: '',
+      current_location_id: '',
+      preferred_location_id: '',
+      availability_status: 'Available',
+      primary_skill_id: '',
+    });
+    setShowCreateModal(true);
+  };
+
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    setCreateLoading(true);
+    try {
+      const payload = { ...createForm };
+      
+      // employee_id and email are passed from user context, ensure they aren't empty
+      if (!payload.employee_id || !payload.email) {
+          throw new Error('Employee ID and Email are required.');
+      }
+      
+      // user_id MUST be set for profile creation
+      payload.user_id = user.id;
+
+      if (payload.years_of_experience !== '') payload.years_of_experience = parseFloat(payload.years_of_experience);
+      else payload.years_of_experience = 0;
+      if (payload.cluster_id) payload.cluster_id = parseInt(payload.cluster_id);
+      else throw new Error("Cluster is required");
+      if (payload.current_location_id) payload.current_location_id = parseInt(payload.current_location_id);
+      else payload.current_location_id = null;
+      if (payload.preferred_location_id) payload.preferred_location_id = parseInt(payload.preferred_location_id);
+      else payload.preferred_location_id = null;
+      if (payload.primary_skill_id) payload.primary_skill_id = parseInt(payload.primary_skill_id);
+      else payload.primary_skill_id = null;
+
+      await createResource(payload);
+      setToast({ message: 'Profile created successfully', type: 'success' });
+      setShowCreateModal(false);
+      
+      // Update local storage user token details if we could, 
+      // but simpler is to just reload the profile
+      await loadProfile();
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message || 'Failed to create profile';
+      setToast({ message: msg, type: 'error' });
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  const openEditModal = () => {
+    if (!resource) return;
+    setEditForm({
+      name: resource.name || '',
+      email: resource.email || '',
+      designation: resource.designation || '',
+      years_of_experience: resource.years_of_experience ?? '',
+      cluster_id: resource.cluster_id || '',
+      current_location_id: resource.current_location_id || '',
+      preferred_location_id: resource.preferred_location_id || '',
+      availability_status: resource.availability_status || 'Available',
+      primary_skill_id: resource.primary_skill_id || '',
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!resource) return;
+    setEditLoading(true);
+    try {
+      const payload = { ...editForm };
+      // Convert numeric fields
+      if (payload.years_of_experience !== '') payload.years_of_experience = parseFloat(payload.years_of_experience);
+      else delete payload.years_of_experience;
+      if (payload.cluster_id) payload.cluster_id = parseInt(payload.cluster_id);
+      else delete payload.cluster_id;
+      if (payload.current_location_id) payload.current_location_id = parseInt(payload.current_location_id);
+      else payload.current_location_id = null;
+      if (payload.preferred_location_id) payload.preferred_location_id = parseInt(payload.preferred_location_id);
+      else payload.preferred_location_id = null;
+      if (payload.primary_skill_id) payload.primary_skill_id = parseInt(payload.primary_skill_id);
+      else payload.primary_skill_id = null;
+
+      await updateResource(resource.employee_id, payload);
+      setToast({ message: 'Profile updated successfully', type: 'success' });
+      setShowEditModal(false);
+      await loadProfile();
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'Failed to update profile';
+      setToast({ message: msg, type: 'error' });
+    } finally {
+      setEditLoading(false);
+    }
+  };
 
   const handleAddTraining = async (e) => {
     e.preventDefault();
@@ -87,7 +210,6 @@ const ProfilePage = () => {
       setToast({ message: 'Training added successfully', type: 'success' });
       setShowTrainingModal(false);
       setTrainingForm({ training_name: '', skill_id: '', status: 'Planned', start_date: '', completion_date: '' });
-      // Reload
       const trainRes = await getTraining(resource.employee_id);
       setTraining(trainRes.data);
     } catch (err) {
@@ -152,7 +274,10 @@ const ProfilePage = () => {
         <>
           {/* Resource Info */}
           <div className="card" style={{ marginBottom: '20px' }}>
-            <div className="card-header">Resource Profile</div>
+            <div className="flex-between" style={{ marginBottom: '18px' }}>
+              <div className="card-header" style={{ marginBottom: 0 }}>Resource Profile</div>
+              <button className="btn-primary btn-sm" onClick={openEditModal}>Edit Profile</button>
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <div><label>Employee ID</label><div style={{ fontWeight: 600, color: 'var(--black)' }}>{resource.employee_id}</div></div>
               <div><label>Name</label><div style={{ fontWeight: 500 }}>{resource.name}</div></div>
@@ -220,10 +345,155 @@ const ProfilePage = () => {
         <div className="card">
           <div className="empty-state">
             <p style={{ fontWeight: 500, color: 'var(--black)' }}>No resource profile linked to your account.</p>
-            <p style={{ fontSize: '12.5px', marginTop: '6px', color: 'var(--gray)' }}>Contact an administrator to link a resource profile to your user account.</p>
+            <p style={{ fontSize: '12.5px', marginTop: '6px', marginBottom: '16px', color: 'var(--gray)' }}>You can create your resource profile now to track your skills and training.</p>
+            <button className="btn-primary" onClick={openCreateModal}>Create Profile</button>
           </div>
         </div>
       )}
+
+      {/* Create Profile Modal */}
+      <Modal isOpen={showCreateModal} title="Create Resource Profile" onClose={() => setShowCreateModal(false)}>
+        <form onSubmit={handleCreateSubmit}>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Employee ID</label>
+              <input value={createForm.employee_id || ''} disabled style={{ backgroundColor: '#f5f5f5', color: '#888' }} />
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <input type="email" value={createForm.email || ''} disabled style={{ backgroundColor: '#f5f5f5', color: '#888' }} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Name *</label>
+            <input value={createForm.name || ''} onChange={e => setCreateForm(p => ({ ...p, name: e.target.value }))} required />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Designation *</label>
+              <input value={createForm.designation || ''} onChange={e => setCreateForm(p => ({ ...p, designation: e.target.value }))} required />
+            </div>
+            <div className="form-group">
+              <label>Years of Experience</label>
+              <input type="number" step="0.5" min="0" value={createForm.years_of_experience ?? ''} onChange={e => setCreateForm(p => ({ ...p, years_of_experience: e.target.value }))} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Cluster *</label>
+              <select value={createForm.cluster_id || ''} onChange={e => setCreateForm(p => ({ ...p, cluster_id: e.target.value }))} required>
+                <option value="">Select cluster</option>
+                {clusters.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Availability Status</label>
+              <select value={createForm.availability_status || ''} onChange={e => setCreateForm(p => ({ ...p, availability_status: e.target.value }))}>
+                <option value="Available">Available</option>
+                <option value="Allocated">Allocated</option>
+                <option value="On Training">On Training</option>
+                <option value="On Leave">On Leave</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Current Location</label>
+              <select value={createForm.current_location_id || ''} onChange={e => setCreateForm(p => ({ ...p, current_location_id: e.target.value }))}>
+                <option value="">Select location</option>
+                {locations.map(l => <option key={l.id} value={l.id}>{l.city}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Preferred Location</label>
+              <select value={createForm.preferred_location_id || ''} onChange={e => setCreateForm(p => ({ ...p, preferred_location_id: e.target.value }))}>
+                <option value="">Select location</option>
+                {locations.map(l => <option key={l.id} value={l.id}>{l.city}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Primary Skill</label>
+            <select value={createForm.primary_skill_id || ''} onChange={e => setCreateForm(p => ({ ...p, primary_skill_id: e.target.value }))}>
+              <option value="">Select skill</option>
+              {skills.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </div>
+          <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={createLoading}>
+            {createLoading ? 'Creating...' : 'Create Profile'}
+          </button>
+        </form>
+      </Modal>
+
+      {/* Edit Profile Modal */}
+      <Modal isOpen={showEditModal} title="Edit Resource Profile" onClose={() => setShowEditModal(false)}>
+        <form onSubmit={handleEditSubmit}>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Name</label>
+              <input value={editForm.name || ''} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <input type="email" value={editForm.email || ''} onChange={e => setEditForm(p => ({ ...p, email: e.target.value }))} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Designation</label>
+              <input value={editForm.designation || ''} onChange={e => setEditForm(p => ({ ...p, designation: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label>Years of Experience</label>
+              <input type="number" step="0.5" min="0" value={editForm.years_of_experience ?? ''} onChange={e => setEditForm(p => ({ ...p, years_of_experience: e.target.value }))} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Cluster</label>
+              <select value={editForm.cluster_id || ''} onChange={e => setEditForm(p => ({ ...p, cluster_id: e.target.value }))}>
+                <option value="">Select cluster</option>
+                {clusters.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Availability Status</label>
+              <select value={editForm.availability_status || ''} onChange={e => setEditForm(p => ({ ...p, availability_status: e.target.value }))}>
+                <option value="Available">Available</option>
+                <option value="Allocated">Allocated</option>
+                <option value="On Training">On Training</option>
+                <option value="On Leave">On Leave</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Current Location</label>
+              <select value={editForm.current_location_id || ''} onChange={e => setEditForm(p => ({ ...p, current_location_id: e.target.value }))}>
+                <option value="">Select location</option>
+                {locations.map(l => <option key={l.id} value={l.id}>{l.city}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Preferred Location</label>
+              <select value={editForm.preferred_location_id || ''} onChange={e => setEditForm(p => ({ ...p, preferred_location_id: e.target.value }))}>
+                <option value="">Select location</option>
+                {locations.map(l => <option key={l.id} value={l.id}>{l.city}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Primary Skill</label>
+            <select value={editForm.primary_skill_id || ''} onChange={e => setEditForm(p => ({ ...p, primary_skill_id: e.target.value }))}>
+              <option value="">Select skill</option>
+              {skills.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </div>
+          <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={editLoading}>
+            {editLoading ? 'Saving...' : 'Save Changes'}
+          </button>
+        </form>
+      </Modal>
 
       {/* Add Training Modal */}
       <Modal isOpen={showTrainingModal} title="Add Training Record" onClose={() => setShowTrainingModal(false)}>

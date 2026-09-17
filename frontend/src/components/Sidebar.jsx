@@ -8,26 +8,26 @@ const Sidebar = () => {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <span className="sidebar-header-icon">❖</span> Resource Portal
+        Resource Portal
       </div>
       <nav className="sidebar-nav">
         {(role === 'admin' || role === 'senior_associate') && (
           <>
             <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>
-              <span>📊</span> Dashboard
+              Dashboard 
             </NavLink>
             <NavLink to="/resources" className={({ isActive }) => isActive ? 'active' : ''}>
-              <span>👥</span> Resources
+              Resources
             </NavLink>
           </>
         )}
         {role === 'admin' && (
           <NavLink to="/admin" className={({ isActive }) => isActive ? 'active' : ''}>
-            <span>⚙️</span> Administration
+            Administration
           </NavLink>
         )}
         <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''}>
-          <span>👤</span> My Profile
+          My Profile
         </NavLink>
       </nav>
     </div>
