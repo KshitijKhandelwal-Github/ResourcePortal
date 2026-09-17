@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUsers, updateUser } from '../api/users';
+import { getUsers, updateUser, deleteUser } from '../api/users';
 import { getClusters, createCluster, updateCluster, deleteCluster } from '../api/clusters';
 import { getLocations, createLocation, updateLocation, deleteLocation } from '../api/locations';
 import { getSkills, createSkill, updateSkill, deleteSkill } from '../api/skills';
@@ -93,6 +93,21 @@ const UsersTab = ({ setToast }) => {
     }
   };
 
+  const handleDelete = async (user) => {
+    if (!window.confirm(`Delete user "${user.username}"?`)) return;
+
+    try {
+      await deleteUser(user.id);
+      setToast({ message: 'User deleted successfully', type: 'success' });
+      loadUsers();
+    } catch (err) {
+      setToast({
+        message: err.response?.data?.detail || 'Failed to delete user',
+        type: 'error',
+      });
+    }
+  };
+
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -128,6 +143,9 @@ const UsersTab = ({ setToast }) => {
                 <td>
                   <button className="btn-secondary btn-sm" onClick={() => toggleActive(u)}>
                     {u.is_active ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button className="btn-danger btn-sm" onClick={() => handleDelete(u)} style={{ marginLeft: '8px' }}>
+                    Delete
                   </button>
                 </td>
               </tr>
